@@ -42,7 +42,15 @@ if( !class_exists( 'ADP_Job_Listing' )){
         function __construct() {
 			$this->define_constants(); 
             require_once( ADP_Job_Listing_PATH . 'inc/abp_job_listing_workfroce_shortcode.php' );
-            $FMI_Product_Subscription_edit_shortcode = new FMI_Product_Subscription_edit_shortcode();
+            $ADP_Jobs_edit_shortcode = new ADP_Jobs_edit_shortcode();
+
+            require_once( ADP_Job_Listing_PATH . 'inc/jobdata_fetch.php' );
+            $ADP_Jobs_fetch_jobs = new ADP_Jobs_fetch_jobs();
+
+            require_once( ADP_Job_Listing_PATH . 'inc/adpjobs_options.php' );
+            $ADP_Jobs_plugin_options = new ADP_Jobs_plugin_options();
+
+            add_action( 'wp_enqueue_scripts', array( $this,'register_scripts_adpjobs' ));
 		}
 
 		public function define_constants(){
@@ -50,6 +58,14 @@ if( !class_exists( 'ADP_Job_Listing' )){
 			define( 'ADP_Job_Listing_URL', plugin_dir_url( __FILE__ ) );
 			define( 'ADP_Job_Listing_VERSION', '1.0.0' );
 		}
+
+
+        public function register_scripts_adpjobs(){
+            wp_enqueue_style( 'adpjobs-customcss', ADP_Job_Listing_URL . 'assets/css/style.css',array(),time());
+            wp_enqueue_script('jquery');
+            //wp_enqueue_script( 'adpjobs-customdata', ADP_Job_Listing_URL . 'assets/data.js',array(),time());
+            wp_enqueue_script( 'adpjobs-customjs', ADP_Job_Listing_URL . 'assets/js/custom.js',array(),time(),true);
+        }
 
 		public static function activate(){
 
@@ -60,14 +76,17 @@ if( !class_exists( 'ADP_Job_Listing' )){
 
               /* Subscription Plans Table */
               $adpJobTableSql = "CREATE TABLE $adpJobTableSql (
-                id MEDIUMINT(11) NOT NULL AUTO_INCREMENT,
+                id int NOT NULL AUTO_INCREMENT,
                 created_on datetime NOT NULL,
-                job_id MEDIUMINT(100) NOT NULL,
+                job_id varchar(255) NOT NULL,
                 job_title varchar(255) NOT NULL,
-                job_categeroy varchar(255) NOT NULL,
-                joblocation_city varchar(255) NOT NULL,
-                joblocation_country varchar(255) NOT NULL,
-                job_date varchar(255) NOT NULL,
+                job_description LONGTEXT NOT NULL,
+                job_category varchar(255) NOT NULL,
+                joblocation_code varchar(255) NOT NULL,
+                joblocation_name varchar(255) NOT NULL,
+                joblocation_cityname varchar(255) NOT NULL,
+                job_post_date datetime NOT NULL,
+                job_expire_date datetime NOT NULL,
                 job_url varchar(255) NOT NULL,
                 UNIQUE KEY id (id)
             ) $charset_collate;";
